@@ -1,13 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace Game_Of_Life
 {
@@ -16,11 +9,24 @@ namespace Game_Of_Life
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+
+        Texture2D cell;
+        GameOfLife gameOfLife;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        int timeElapsed = 0;
+
+        const int WINDOW_WIDTH = 800;
+        const int WINDOW_HEIGHT = 600;
+        const int GAME_TICK = 80;
+        const int PIXEL_SIZE = 4;
+        const int LIFE_DENSITY = 20;
+        readonly int[] SURVIVORS = { 2, 3 };
+        readonly int[] REPRODUCTORS = { 3 };
 
         public Game1()
         {
+            this.Window.Title = "Game of Life";
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -34,7 +40,10 @@ namespace Game_Of_Life
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
+            graphics.IsFullScreen = false;
+            graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
+            graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
+            graphics.ApplyChanges();
             base.Initialize();
         }
 
@@ -48,6 +57,10 @@ namespace Game_Of_Life
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            gameOfLife = new GameOfLife(WINDOW_WIDTH / PIXEL_SIZE, WINDOW_HEIGHT / PIXEL_SIZE, LIFE_DENSITY, REPRODUCTORS, SURVIVORS);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            cell = new Texture2D(graphics.GraphicsDevice, 1, 1);
+            cell.SetData(new Color[] { Color.White });
         }
 
         /// <summary>
@@ -84,6 +97,25 @@ namespace Game_Of_Life
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            timeElapsed += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+            if (timeElapsed > GAME_TICK)
+            {
+                gameOfLife.Tick();
+                timeElapsed = 0;
+            }
+
+            spriteBatch.Begin();
+
+            for (int x = 0; x < WINDOW_WIDTH; x += PIXEL_SIZE)
+            {
+                for (int y = 0; y < WINDOW_HEIGHT; y += PIXEL_SIZE)
+                {
+                    Rectangle rectangle = new Rectangle(x, y, PIXEL_SIZE, PIXEL_SIZE);
+                    spriteBatch.Draw(cell, rectangle, gameOfLife.GetColor(x / PIXEL_SIZE, y / PIXEL_SIZE));
+                }
+            }
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
