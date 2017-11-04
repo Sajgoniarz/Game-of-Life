@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using WinForms = System.Windows.Forms;
 
 namespace Game_Of_Life
 {
@@ -16,12 +18,28 @@ namespace Game_Of_Life
         SpriteBatch spriteBatch;
         int timeElapsed = 0;
 
-        public Game1()
+        public Game1(Settings settings, IntPtr desktopHandler)
         {
-            this.Window.Title = "Game of Life";
             graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-            config = new Settings();
+            config = settings;
+
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.IsFullScreen = false;
+
+            W32.SetParent(Window.Handle, desktopHandler);
+            var form = WinForms.Control.FromHandle(this.Window.Handle) as WinForms.Form;
+            form.FormBorderStyle = WinForms.FormBorderStyle.None;
+        }
+
+        public Game1(Settings settings)
+        {
+            graphics = new GraphicsDeviceManager(this);
+            config = settings;
+
+            graphics.PreferredBackBufferWidth = config.Width;
+            graphics.PreferredBackBufferHeight = config.Height;
+            graphics.IsFullScreen = config.Fullscreen;
         }
 
         /// <summary>
@@ -33,11 +51,7 @@ namespace Game_Of_Life
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = config.Width;
-            graphics.PreferredBackBufferHeight = config.Height;
-            graphics.IsFullScreen = config.Fullscreen;
-            graphics.ApplyChanges();
+            
             base.Initialize();
         }
 
@@ -51,7 +65,7 @@ namespace Game_Of_Life
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            gameOfLife = new GameOfLife(config.Width / config.PixelSize, config.Height / config.PixelSize, config.Density, config.Reproductors, config.Survivors);
+            gameOfLife = new GameOfLife(graphics.PreferredBackBufferWidth / config.PixelSize, graphics.PreferredBackBufferHeight / config.PixelSize, config.Density, config.Reproductors, config.Survivors);
             spriteBatch = new SpriteBatch(GraphicsDevice);
             cell = new Texture2D(graphics.GraphicsDevice, 1, 1);
             cell.SetData(new Color[] { Color.White });
@@ -101,9 +115,9 @@ namespace Game_Of_Life
 
             spriteBatch.Begin();
 
-            for (int x = 0; x < config.Width / config.PixelSize; x++)
+            for (int x = 0; x < graphics.PreferredBackBufferWidth / config.PixelSize; x++)
             {
-                for (int y = 0; y < config.Height / config.PixelSize; y++)
+                for (int y = 0; y < graphics.PreferredBackBufferHeight / config.PixelSize; y++)
                 {
                     Rectangle rectangle = new Rectangle(x * config.PixelSize, y * config.PixelSize, config.PixelSize, config.PixelSize);
                     spriteBatch.Draw(cell, rectangle, gameOfLife.GetColor(x, y));

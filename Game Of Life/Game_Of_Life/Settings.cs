@@ -8,6 +8,7 @@ namespace Game_Of_Life
         public readonly int Width;
         public readonly int Height;
         public readonly bool Fullscreen;
+        public readonly bool WallpaperMode;
         public readonly int PixelSize;
         public readonly int Density;
         public readonly int TickTime;
@@ -19,6 +20,7 @@ namespace Game_Of_Life
         {
             var config = ConfigurationManager.AppSettings;
             Fullscreen = bool.Parse(config["Fullscreen"]);
+            WallpaperMode = bool.Parse(config["WallpaperMode"]);
             Width = int.Parse(config["WindowWidth"]);
             Height = int.Parse(config["WindowHeight"]);
             PixelSize = int.Parse(config["PixelSize"]);
