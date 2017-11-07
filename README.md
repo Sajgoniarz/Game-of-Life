@@ -8,6 +8,7 @@ Implementation of [Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_o
 * **WindowWidth** - Application window width
 * **WindowHeight** - Application window height
 * **Fullscreen** - Flag to display window in fullscreen mode
+* **WallpaperMode** - Flag to display as Wallpaper - Experimental "Works for me". (To close it, you need to kill process)
 * **PixelSize** - Multiplication ratio for a pixel, useful for more detailed projection without messing with window settings
 * **Density** - Describes how many % of cells should be alive in first generation
 * **TickTime** - Time in ms between spawning next generation
